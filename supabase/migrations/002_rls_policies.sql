@@ -1,0 +1,2 @@
+-- RLS policies were removed for local PostgreSQL.
+-- Access control is handled in Next.js API routes with signed admin sessions.

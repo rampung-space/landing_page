@@ -1,0 +1,71 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { buildInsert, queryOne } from "@/lib/db/postgres";
+import { calculateScore, getFlags } from "@/components/diagnostic/scoringEngine";
+import type { DiagnosticFormData, DiagnosticSubmission } from "@/types/diagnostic";
+import { isValidWhatsAppPhone, normalizeWhatsAppPhone } from "@/lib/whatsapp";
+import { notifyDiagnosticSubmission } from "@/lib/discord";
+
+export async function POST(request: NextRequest) {
+  try {
+    const body: DiagnosticFormData = await request.json();
+    const phone = normalizeWhatsAppPhone(body.phone ?? "");
+
+    // Validate required fields
+    if (!body.name || body.name.length < 2) {
+      return NextResponse.json({ error: "Name is required (min 2 chars)" }, { status: 400 });
+    }
+    if (!phone || !isValidWhatsAppPhone(phone)) {
+      return NextResponse.json({ error: "Valid WhatsApp number is required" }, { status: 400 });
+    }
+    if (!body.platform) {
+      return NextResponse.json({ error: "Platform is required" }, { status: 400 });
+    }
+    if (!body.target_user) {
+      return NextResponse.json({ error: "Target user is required" }, { status: 400 });
+    }
+    if (!body.features || body.features.length === 0) {
+      return NextResponse.json({ error: "At least 1 feature is required" }, { status: 400 });
+    }
+    if (!body.timeline) {
+      return NextResponse.json({ error: "Timeline is required" }, { status: 400 });
+    }
+
+    // Calculate scores
+    const score = calculateScore(body);
+    const flags = getFlags(body, score);
+
+    const insert = buildInsert("diagnostic_submissions", {
+        name: body.name,
+        phone,
+        company: body.company || null,
+        platform: body.platform,
+        platform_other: body.platform_other || null,
+        target_user: body.target_user,
+        features: body.features,
+        timeline: body.timeline,
+        score_platform: score.platform,
+        score_target_user: score.targetUser,
+        score_features: score.features,
+        score_timeline: score.timeline,
+        total_score: score.totalScore,
+        complexity_level: score.complexityLevel,
+        timeline_warning: flags.timelineWarning,
+        needs_multi_tenant: flags.needsMultiTenant,
+        status: "new",
+      });
+
+    const data = await queryOne<DiagnosticSubmission>(insert.text, insert.values);
+    if (!data) return NextResponse.json({ error: "Failed to save submission" }, { status: 500 });
+
+    try {
+      await notifyDiagnosticSubmission(data);
+    } catch (discordError) {
+      console.error("Discord notification error:", discordError);
+    }
+
+    return NextResponse.json({ success: true, id: data.id });
+  } catch (err) {
+    console.error("API error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
