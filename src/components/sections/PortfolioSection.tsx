@@ -41,6 +41,17 @@ const placeholderPortfolios = [
     "solutionEn": "VSNotes provides an automated solution by capturing and recording audio directly from the active playback device across various platforms, utilizing AI to instantly generate accurate notes and summaries.",
     "tags": ["Desktop App", "AI", "Educational"],
     "url": "https://vsnotes.space/"
+  },
+  {
+    "id": "MATCH",
+    "title": "MATCH: AI Outfit Recommendation System",
+    "titleEn": "MATCH: AI Outfit Recommendation System",
+    "challenge": "Kebanyakan aplikasi rekomendasi fashion berasumsi pengguna memiliki katalog besar atau mendorong pembelian produk baru. Tantangan nyatanya adalah membangun sistem yang bekerja dengan koleksi pakaian terbatas milik pengguna sendiri, sambil tetap memberikan rekomendasi yang akurat dan sesuai. Selain itu, menentukan warna kulit dan bentuk tubuh dari foto memerlukan AI visual yang andal, serta merekomendasikan palet warna yang harmonis membutuhkan pemahaman mendalam tentang teori warna dan prinsip fashion.",
+    "challengeEn": "Most fashion recommendation apps assume users have a large catalog or push new products for purchase. The real challenge is building a system that works with limited, user-owned wardrobe collections while delivering accurate, flattering recommendations. Additionally, determining skin tone and body shape from photos requires robust visual AI, and recommending harmonious color palettes demands deep understanding of color theory and fashion principles.",
+    "solution": "MATCH memberikan solusi rekomendasi outfit cerdas dengan mengadopsi arsitektur 'Computer Vision + Generative AI'. Pengguna mengunggah foto koleksi pakaian mereka dan foto selfie. Sistem menggunakan visi komputer untuk mengekstrak atribut pakaian (warna, kategori, gaya) dan menganalisis warna kulit (warm/cool/neutral) serta bentuk tubuh (hourglass, pear, apple, dll.). Mesin rekomendasi kemudian menghasilkan paduan outfit berdasarkan aturan harmoni warna, kompatibilitas siluet, dan preferensi acara — semuanya dari lemari pakaian yang sudah dimiliki pengguna.",
+    "solutionEn": "MATCH provides an intelligent outfit recommendation solution by adopting a 'Computer Vision + Generative AI' architecture. Users upload photos of their clothing collection and a selfie. The system uses computer vision to extract garment attributes (color, category, style) and analyze skin tone (warm/cool/neutral) and body shape (hourglass, pear, apple, etc.). A recommendation engine then generates outfit pairings based on color harmony rules, silhouette compatibility, and occasion preferences — all from the user's existing wardrobe.",
+    "tags": ["Web App", "AI", "Fashion", "Computer Vision"],
+    "url": "https://analation-fashion-fe.vercel.app"
   }
 ];
 
