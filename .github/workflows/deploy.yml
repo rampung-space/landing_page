@@ -100,11 +100,17 @@ jobs:
             "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_SLOT='$DEPLOY_SLOT' PROMOTE='$PROMOTE' IMAGE_TAG='$IMAGE_TAG' bash -s" <<'REMOTE_SCRIPT'
           set -euo pipefail
           cd "$DEPLOY_PATH"
-          git fetch origin main
-          git checkout main
-          git pull --ff-only origin main
           if [ "$DEPLOY_SLOT" = "auto" ]; then
-            ACTIVE_SLOT="$(cat .active-slot-landing 2>/dev/null || echo green)"
+            ACTIVE_SLOT="$(cat .active-slot-landing 2>/dev/null || true)"
+            if [ -z "$ACTIVE_SLOT" ]; then
+              if grep -q 'server app-landing-blue:' nginx/active/upstreams-landing.conf 2>/dev/null; then
+                ACTIVE_SLOT=blue
+              elif grep -q 'server app-landing-green:' nginx/active/upstreams-landing.conf 2>/dev/null; then
+                ACTIVE_SLOT=green
+              else
+                ACTIVE_SLOT=green
+              fi
+            fi
             if [ "$ACTIVE_SLOT" = "blue" ]; then TARGET_SLOT=green; else TARGET_SLOT=blue; fi
           else
             TARGET_SLOT="$DEPLOY_SLOT"
